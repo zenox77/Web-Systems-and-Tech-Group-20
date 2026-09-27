@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Tiktak is a simple browser-based time tracking app for logging time across projects." />
+  <title>Tiktak | Time Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Tiktak home">
+        <span class="brand-mark" aria-hidden="true">T</span>
+        <span>Tiktak</span>
+      </a>
+
+      <nav class="nav-list">
+        <a class="nav-link active" href="#dashboard"><span>▦</span> Dashboard</a>
+        <a class="nav-link" href="#manual-entry"><span>＋</span> Add time</a>
+        <a class="nav-link" href="#projects"><span>◫</span> Projects</a>
+        <a class="nav-link" href="#entries"><span>≡</span> Time log</a>
+      </nav>
+
+      <div class="sidebar-note">
+        <strong>Milestone 1</strong>
+        <p>HTML + CSS + JavaScript frontend with local browser storage.</p>
+      </div>
+    </aside>
+
+    <main class="main-content" id="top">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Browser-based time tracking</p>
+          <h1>Track where your time goes.</h1>
+          <p class="subtitle">Start a timer, add time manually, and review your daily activity by project.</p>
+        </div>
+        <div class="date-pill" id="currentDate" aria-label="Current date"></div>
+      </header>
+
+      <section class="stats-grid" id="dashboard" aria-label="Today's summary">
+        <article class="stat-card">
+          <span class="stat-label">Tracked today</span>
+          <strong class="stat-value" id="totalToday">0m</strong>
+          <span class="stat-help">Across all projects</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Sessions today</span>
+          <strong class="stat-value" id="sessionsToday">0</strong>
+          <span class="stat-help">Completed entries</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Top project</span>
+          <strong class="stat-value stat-value-text" id="topProject">—</strong>
+          <span class="stat-help">Most tracked today</span>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel timer-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Live tracker</p>
+              <h2>Focus timer</h2>
+            </div>
+            <span class="status-badge" id="timerStatus">Ready</span>
+          </div>
+
+          <div class="timer-display" id="timerDisplay" aria-live="polite">00:00:00</div>
+
+          <div class="form-grid two-col">
+            <label>
+              Project
+              <select id="timerProject" aria-label="Timer project"></select>
+            </label>
+            <label>
+              What are you working on?
+              <input id="timerNote" type="text" maxlength="80" placeholder="e.g. Finish homepage layout" />
+            </label>
+          </div>
+
+          <div class="timer-actions">
+            <button class="btn btn-primary" id="startTimerBtn" type="button">Start timer</button>
+            <button class="btn btn-secondary" id="pauseTimerBtn" type="button" disabled>Pause</button>
+            <button class="btn btn-danger-soft" id="stopTimerBtn" type="button" disabled>Stop & save</button>
+          </div>
+          <p class="helper-text">The active timer is saved in your browser, so refreshing the page will not lose the current session.</p>
+        </article>
+
+        <article class="panel" id="manual-entry">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Manual entry</p>
+              <h2>Add time</h2>
+            </div>
+          </div>
+
+          <form id="manualForm" novalidate>
+            <div class="form-grid two-col">
+              <label>
+                Date
+                <input id="manualDate" type="date" required />
+              </label>
+              <label>
+                Project
+                <select id="manualProject" required></select>
+              </label>
+              <label>
+                Start time
+                <input id="manualStart" type="time" required />
+              </label>
+              <label>
+                End time
+                <input id="manualEnd" type="time" required />
+              </label>
+            </div>
+            <label>
+              Note
+              <input id="manualNote" type="text" maxlength="80" placeholder="Optional description" />
+            </label>
+            <p class="form-error" id="manualError" role="alert"></p>
+            <button class="btn btn-primary full-width" type="submit">Save time entry</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="panel" id="projects">
+        <div class="panel-heading split-heading">
+          <div>
+            <p class="eyebrow">Organize your work</p>
+            <h2>Projects</h2>
+          </div>
+          <form class="inline-form" id="projectForm">
+            <label class="sr-only" for="projectName">New project name</label>
+            <input id="projectName" type="text" maxlength="30" placeholder="New project name" required />
+            <button class="btn btn-secondary" type="submit">Add project</button>
+          </form>
+        </div>
+        <p class="form-error" id="projectError" role="alert"></p>
+        <div class="project-chips" id="projectChips" aria-live="polite"></div>
+      </section>
+
+      <section class="panel" id="entries">
+        <div class="panel-heading split-heading">
+          <div>
+            <p class="eyebrow">Review activity</p>
+            <h2>Time log</h2>
+          </div>
+          <div class="log-controls">
+            <label class="compact-label">
+              <span>Filter</span>
+              <select id="entryFilter"></select>
+            </label>
+            <button class="btn btn-ghost" id="clearEntriesBtn" type="button">Clear all</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Project</th>
+                <th>Activity</th>
+                <th>Duration</th>
+                <th>Source</th>
+                <th><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="entryTableBody"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon" aria-hidden="true">◷</div>
+            <strong>No time entries yet</strong>
+            <p>Start the timer or add a manual entry to build your time log.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <span>Tiktak • Group 20 • Milestone 1</span>
+        <span>Data stays in this browser using localStorage.</span>
+      </footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
